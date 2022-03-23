@@ -9,16 +9,11 @@ using namespace std;
 const int VMAX = 1e5;
 const int INF = 1e7;
 
-struct edge {
-	int src, dest, weight;
-};
-
 class Graph {
 	char* infile;
 	char* outfile;
 	int V;
 	int E;
-	vector<edge> edges;
 	list<pair<int, int>>* adj;
 
 public:
@@ -45,7 +40,7 @@ Graph::Graph(char* in, char* out) {
 	this->adj = new list<pair<int, int>>[V];
 	this->V = V;
 	this->E = E;
-	for(int u, v, w; fin >> u >> v >> w; adj[u].push_back({ v, w }), edges.push_back({ u, v, w }));
+	for(int u, v, w; fin >> u >> v >> w; adj[u].push_back({ v, w }));
 	fin.close();
 }
 
@@ -82,14 +77,21 @@ void Graph::dijkstra(int src) {
 }
 
 bool Graph::bellmanFord() {
+	struct edge {
+		int src, dest, weight;
+	};
+	vector<edge> edges;
 	vector<int> dist(V + 1, INF);
 	dist[V] = 0;
-
+	
 	for (int i = 0; i < V; ++i) {
 		edges.push_back({ V, i, 0 });
+		for (auto j : adj[i]) {
+			edges.push_back({ i, j.first, j.second });
+		}
 	}
 
-	for (int i = 0; i < V; ++i) {
+	for (int i = 0; i < V - 1; ++i) {
 		for (auto j : edges) {
 			if (dist[j.src] != INF && dist[j.dest] > dist[j.src] + j.weight) {
 				dist[j.dest] = dist[j.src] + j.weight;
@@ -109,13 +111,10 @@ bool Graph::bellmanFord() {
 		}
 	}
 
-	for (auto j : edges) {
-		j.weight += dist[j.src] - dist[j.dest];
-		fout << j.src << " " << j.dest << " " << j.weight << "\n";
-	}
 	for (int i = 0; i < V; ++i) {
 		for (auto j : adj[i]) {
 			j.second += dist[i] - dist[j.first];
+			fout << i << " " << j.first << " " << j.second << "\n";
 		}
 	}
 	
