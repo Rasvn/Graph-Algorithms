@@ -1,26 +1,50 @@
 #!/bin/bash
 
 printf "Testing problem 1\n"
-for N in {1..7}
-do
-	./p1.exe "1/$N-in.txt" "1.out" > /dev/null
-	diff -sw "1/$N-out.txt" "1.out" > /dev/null
-	if [ $? -eq 0 ]; then
-		printf "\tTest $N - succes!\n"
-	else
-		printf "\tTest $N - failed!\n"
-	fi
-done
+g++ -Wall -g -o "p1.exe" "p1.cpp" 2> /dev/null
+if [ $? -eq 0 ]; then
+	printf "  p1.cpp build succesfully\n"
+	for N in {1..7}
+	do
+		valgrind --leak-check=full --show-reachable=yes --xml=yes --xml-file=unit_tests_valgrind.out.xml --error-exitcode=1 ./p1.exe "1/$N-in.txt" "1.out" > /dev/null
+		#./p1.exe "1/$N-in.txt" "1.out"
+		if [ $? -eq 0 ]; then
+			diff -sw "1/$N-out.txt" "1.out" > /dev/null
+			if [ $? -eq 0 ]; then
+				printf "\ttest $N - succes!\n"
+			else
+				printf "\ttest $N - failed!\n"
+			fi
+		else
+			printf "\ttest $N - leaks!\n"
+		fi
+	done
+else
+	printf "  p1.cpp build failed\n"
+fi
 
 printf "\nTesting problem 2\n"
-for N in {1..10}
-do
-	./p2.exe "2/$N-in.txt" "2.out" > /dev/null
-	diff -w "2/$N-out.txt" "2.out" > /dev/null
-	if [ $? -eq 0 ]; then
-		printf "\tTest $N - succes!\n"
-	else
-		printf "\tTest $N - failed!\n"
-	fi
-done
+g++ -Wall -g -o "p2.exe" "p2.cpp" 2> /dev/null
+if [ $? -eq 0 ]; then
+	printf "  p2.cpp build succesfully\n"
+	for N in {1..10}
+	do
+		valgrind --leak-check=full --show-reachable=yes --xml=yes --xml-file=unit_tests_valgrind.out.xml --error-exitcode=1 ./p2.exe "2/$N-in.txt" "2.out" > /dev/null
+		#./p2.exe "2/$N-in.txt" "2.out"
+		if [ $? -eq 0 ]; then
+			diff -sw "2/$N-out.txt" "2.out" > /dev/null
+			if [ $? -eq 0 ]; then
+				printf "\ttest $N - succes!\n"
+			else
+				printf "\ttest $N - failed!\n"
+			fi
+		elif [ $? -eq 1 ]; then
+			printf "\ttest $N - leaks!\n"
+		else
+			printf "\ttest $N - failed!\n"
+		fi
+	done
+else
+	printf "  p2.cpp build failed\n"
+fi
 
