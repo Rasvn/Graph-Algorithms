@@ -4,32 +4,31 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <string>
 
 using namespace std;
 const int VMAX = 1e5;
 const int INF = 1e7;
 
 class Graph {
-	char* infile;
-	char* outfile;
+	string infile;
+	string outfile;
 	int V;
 	int E;
 	list<pair<int, int>>* adj;
 
 public:
-	Graph(char* in, char* out);
+	Graph(string in, string out);
 	void dijkstra(int src);
 	bool bellmanFord();
 	void johnson();
 	~Graph();
 };
 
-Graph::Graph(char* in, char* out) {
-	this->infile = new char[strlen(in) + 1];
-	this->outfile = new char[strlen(out) + 1];
-	strcpy(this->infile, in);
-	strcpy(this->outfile, out);
-	
+Graph::Graph(string in, string out) {
+	this->infile = in;
+	this->outfile = out;
+
 	ifstream fin(this->infile);
 	if (!fin) {
 		cout << "Fisierul de intrare nu a putut fi deschis!\n";
@@ -136,8 +135,6 @@ void Graph::johnson() {
 
 Graph::~Graph() {
 	delete[] adj;
-	delete[] infile;
-	delete[] outfile;
 }
 
 
